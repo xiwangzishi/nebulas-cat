@@ -46,7 +46,7 @@ NVM.prototype = {
     },
 
     run: function (func, args, trans, block) {
-        Blockchain.blockParse(JSON.stringify(block || native.context.block));
+        Blockchain.blockParse(JSON.stringify(block || util.makeBlock()));
 
         var trans = trans || native.context.transaction
         if (!trans.hash) {

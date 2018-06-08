@@ -8,7 +8,9 @@ if (typeof window !== "undefined") {
 
 if (typeof localStorage === "undefined" || localStorage === null) {
     var path = require("path");
-    var storageFile = path.join(__dirname, "./.storage");
+    //var storageFile = path.join(__dirname, "./.storage");
+    var storageFile = path.join(BASE_PATH, "data/storage");
+    
     var LocalStorage = require('node-localstorage').LocalStorage;
     global.localStorage = new LocalStorage(storageFile);
 }

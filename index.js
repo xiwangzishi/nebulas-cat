@@ -31,8 +31,13 @@ var transaction = {
     gasLimit: "20000"
 };
 
-var contract_file = path.join(__dirname, "./bbs.js");
+// path.join(__dirname, "./bbs.js");
+var contract_file = fs.readFileSync("./data/contract_path").toString()
 
+if (!fs.existsSync(contract_file)) {
+    contract_file = path.join(__dirname, "./smartContract/nebulas-cat.js");
+}
+console.log("加载的合约文件：", contract_file)
 var NVM = require('./nvm/nvm')
 
 Blockchain.blockParse(JSON.stringify(util.makeBlock()));
@@ -100,7 +105,7 @@ router.post('/v1/user/call', (ctx, next) => {
     var reqBody = ctx.request.body
 
     // Blockchain.blockParse(JSON.stringify(native.context.block));
-    var params = {
+    var trans = {
         hash: "",
         from: reqBody.from,
         to: reqBody.to,
@@ -110,12 +115,25 @@ router.post('/v1/user/call', (ctx, next) => {
         gasPrice: reqBody.gasPrice,
         gasLimit: reqBody.gasLimit
     }
+    var block = util.makeBlock()
 
-    var result = nvm.call(reqBody.contract.function, reqBody.contract.args, params)
+    var result = {
+        "result": '""',
+        "execute_err": "",
+        "estimate_gas": ""
+    }
+
+    try {
+        var call_result = nvm.call(reqBody.contract.function, reqBody.contract.args, trans, block)
+        result.result = call_result == undefined ? '""' : JSON.stringify(result)
+    } catch (e) {
+        // {"result":"Error: 403","execute_err":"Call: Error: 403","estimate_gas":"20378"}
+        result.execute_err = "Call: Error: " + e.message
+        result.result = "Error: " + e.message
+    }
+
     ctx.body = {
-        "result": {
-            "result": JSON.stringify(result)
-        }
+        "result": result
     }
 })
 
@@ -186,14 +204,14 @@ router.post('/v1/user/rawtransaction', (ctx, next) => {
         "nonce": txinfo.nonce,
         "timestamp": ts,
         "type": "binary",
-        "data": txinfo.data || null,
+        "data": txinfo.data.payload || null,
         "gasPrice": txinfo.gasPrice,
         "gasLimit": txinfo.gasLimit,
         "contract_address": "",
         "status": 2, // 交易状态结果： 0 failed失败, 1 success成功, 2 pending确认中.
         "gas_used": "20000",
         "execute_error": "",
-        "execute_result": "null"
+        "execute_result":'""'
     }
     try {
 
@@ -219,13 +237,18 @@ router.post('/v1/user/rawtransaction', (ctx, next) => {
             fs.writeFileSync(contractFile, JSON.stringify(account))
         }
 
+        // 这里还需要拦截部署合约
+
         var result = nvm.call(payload.Function, payload.Args, trans, block)
         transactionReceipt.status = 1
-        transactionReceipt.execute_result = JSON.stringify(result)
+        transactionReceipt.execute_result = result == undefined ? '""' : JSON.stringify(result)
 
     } catch (error) {
         transactionReceipt.status = 0
-        transactionReceipt.execute_error = error
+        transactionReceipt.execute_error = "Call: Error: " + error.message
+        transactionReceipt.execute_result = "Error: " + error.message
+        // execute_error:"Call: Error: 10000"
+        // execute_result:"Error: 10000"
     }
 
     fs.writeFileSync("./data/transaction/" + txhash, JSON.stringify(transactionReceipt))
@@ -268,6 +291,72 @@ router.get('/api/pay/query', (ctx, next) => {
         "code": 0,
         "data": data,
         "msg": "success"
+    }
+})
+
+router.post('/v1/user/getEventsByHash', (ctx, next) => {
+    var reqBody = ctx.request.body
+    var eventsFile = "./data/storage/topic." + reqBody.hash
+    ctx.body = {
+        "result": {
+            "events": JSON.parse(fs.readFileSync(eventsFile))
+        }
+    }
+})
+
+router.get('/_api/checkActivation', (ctx, next) => {
+    if (!fs.existsSync("./data/.activated")) {
+        ctx.body = {
+            status_code: 404,
+            msg: "inactivated"
+        }
+    } else {
+        ctx.body = {
+            status_code: 200,
+            msg: "activated"
+        }
+    }
+})
+
+router.post('/_api/checkActivation', (ctx, next) => {
+    fs.writeFileSync("./data/.activated", ctx.request.rawBody)
+    ctx.body = {
+        status_code: 200,
+        msg: "success"
+    }
+})
+
+router.post('/_api/contract/path', (ctx, next) => {
+    var reqBody = ctx.request.body,
+        contract_path = reqBody.path;
+    var contract_abspath = path.resolve(contract_path)
+
+    if (!fs.existsSync(contract_abspath)) {
+        ctx.body = {
+            status_code: 404,
+            msg: "file not exists"
+        }
+        return
+    }
+
+    fs.writeFileSync("./data/contract_path", contract_abspath)
+    // 删除缓存，重新部署一下
+    delete require.cache[contract_abspath]
+
+    if (reqBody.remove_data) {
+
+        var storage_files = fs.readdirSync('./data/storage');
+        storage_files.forEach(function (ele, index) {
+            fs.unlinkSync("./data/storage/" + ele)
+        })
+        fs.unlinkSync(".init")
+
+    }
+    nvm.deploy(contract_abspath, reqBody.args);
+
+    ctx.body = {
+        status_code: 200,
+        msg: "success"
     }
 })
 

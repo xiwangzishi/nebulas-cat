@@ -1,4 +1,7 @@
-.storage
+storage
 node_modules
 .init
-
+other
+nebulas-cat.zip
+data/
+bbs.js

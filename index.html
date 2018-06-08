@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nebulas Cat 星云智能合约本地开发调试工具</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-ui@2.3.7/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="static/css/style.css?_=1.0.5">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.2.6/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-router@3.0.1/dist/vue-router.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/element-ui@2.3.7/lib/index.js"></script>
+</head>
+
+<body>
+    <div id="app" v-show="visible" style="display: none;">
+        <nav id="nav">
+            <div class="logo-menu">
+                <router-link class="logo" :to="{path:'/'}">Nebulas Cat</router-link>
+                <i class="el-icon-more-outline menu" @click="showMenu"></i>
+            </div>
+            <el-menu :default-active="activeIndex" id="left-menu" class="el-menu left" mode="horizontal">
+                <el-menu-item index="home">
+                    <router-link :to="{path:'/config'}">项目</router-link>
+                </el-menu-item>
+                <el-menu-item index="tutorial">
+                    <router-link :to="{path:'/tutorial'}">教程</router-link>
+                </el-menu-item>
+                <el-menu-item index="donateReceived">
+                    <router-link :to="{path:'/donate/received'}">打赏</router-link>
+                </el-menu-item>
+                <el-menu-item index="qa">
+                    <router-link :to="{path:'/c/qa'}">问答</router-link>
+                </el-menu-item>
+                <el-submenu index="tool">
+                    <template slot="title">常用网址</template>
+                    <el-menu-item>
+                        <a href="https://bbs.forfunapp.com/#/topic/c4b68feed5f1d54f52b90a5b82d48c4baa5f3607b1b7fe9afe2909928f9f63ea">没币怎么办</a>
+                    </el-menu-item>
+                    <el-menu-item>
+                        <a href="https://bbs.forfunapp.com/#/topic/f4cf973721a4265cf4d0f231c583420fce60950f7f02b3fd50e7b008bac0243f">怎么获取钱包账号</a>
+                    </el-menu-item>
+                    <el-menu-item>
+                        <a target="_blank" href="https://nebulasio.github.io/neb.js/index.html">Neb.js 文档</a>
+                    </el-menu-item>
+                    <el-menu-item>
+                        <a target="_blank" href="https://github.com/nebulasio/wiki">官方Wiki</a>
+                    </el-menu-item>
+                    <el-menu-item>
+                        <a target="_blank" href="https://github.com/nebulasio/nebPay/blob/master/doc/NebPay介绍.md">NebPay文档</a>
+                    </el-menu-item>
+                    <el-menu-item>
+                        <a target="_blank" href="https://blog.nebulas.io/2018/05/09/how-to-use-nebpay-in-your-dapp/">NebPay教程</a>
+                    </el-menu-item>
+                    <el-menu-item>
+                        <a target="_blank" href="https://blog.nebulas.io/2018/05/04/how-to-build-a-dapp-on-nebulas-part-1/">手把手教你星云DApp开发</a>
+                    </el-menu-item>
+                </el-submenu>
+            </el-menu>
+            <el-menu :default-active="activeIndex" id="right-menu" class="el-menu right" mode="horizontal" style="padding-right:100px;">
+                <el-menu-item index="nas-num">{{balance}} NAS</el-menu-item>
+            </el-menu>
+        </nav>
+        <div class="container" id="container">
+            <div style="text-align:center;padding-left:20px;">
+                <el-alert type="error" class="noExtension" id="noExtension" v-if="location.host.search('forfunapp')!=-1">
+                    请将该工具下载到本地使用！该工具除了打赏功能外，不能在线上使用！
+                </el-alert>
+                <el-alert type="warning" class="noExtension" id="noExtension">
+                    提交 DAPP 前，请在测试网充分测试后上线！！！
+                </el-alert>
+                <el-alert type="error" class="noExtension" id="noExtension" v-if="noExtension">
+                    注意: 请安装
+                    <a class="blue-color" target="_blank" href="https://github.com/ChengOrangeJu/WebExtensionWallet">浏览器插件钱包</a> 后使用全部功能,
+                    <a class="blue-color" href="https://bbs.forfunapp.com/#/topic/690b1f635d1b89719e718149328eae5ea6204499d239c3e71fc1051b0bec4a39">安装教程</a>
+                </el-alert>
+            </div>
+            <el-row style="padding-top: 5px;">
+                <el-col :span="24" :xs="24" id="content-left">
+                    <div class="content">
+                        <router-view></router-view>
+                    </div>
+                </el-col>
+            </el-row>
+            <div class="footer">
+                <span>使用
+                    <a href="https://nebulas.io/" target="_blank">星云链</a> 驱动</span>&nbsp;|&nbsp;
+                <span>
+                    <a href="https://incentive.nebulas.io/cn/signup.html?invite=YOr2Y" target="_blank">提交DAPP获得 100NAS 币</a>
+                </span>
+            </div>
+        </div>
+    </div>
+    <script type="text/x-template" id="home-tpl">
+        <div id="home" class="box" v-loading="loading" element-loading-text="努力加载中">
+            <div class="topic-list">
+                <div class="header header-black">
+                    <div class="left">
+                        问答列表
+                    </div>
+                    <div class="right">
+                        <a target="_blank" href="htps://bbs.forfunapp.com/#/topic/add" class="el-button el-button--primary el-button--mini is-round">
+                            <i class="el-icon-circle-plus"></i>
+                            <span>我要提问</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="item-list">
+                    <el-row class="topic-item" v-if="checkHiddenTopic(item.hash)" v-for="item in topicList.topic" :key="item.hash">
+                        <el-col :span="2" :xs="4" class="avatar">
+                            <img referrerpolicy="no-referrer" :src="item.user.avatar|buildAvatar" alt="">
+                        </el-col>
+                        <el-col :span="22" :xs="18" class="topic">
+                            <p class="title">
+                                <a :href="item.hash|buildTopicUrl" target="_blank">{{item.title}}</a>
+                            </p>
+                            <div class="topic-info">
+                                <router-link class="category" :to="'/c/'+item.category">{{item.categoryDetail.name}}</router-link>&nbsp;•&nbsp;
+                                <strong>
+                                    <a href="javascript:void(0)">{{item.user.nickName}}</a>
+                                </strong> &nbsp;•&nbsp; {{item.created|dateFormat}}
+                                <span v-if="item.lastUserInfo"> &nbsp;•&nbsp;最后回复来自
+                                    <strong>
+                                        <a href="javascript:void(0)">{{item.lastUserInfo.nickName}}</a>
+                                    </strong>
+                                </span>
+                            </div>
+                            <span class="badge">{{item.replyNums}}</span>
+                        </el-col>
+                    </el-row>
+                </div>
+                <div style="text-align:center;margin:20px auto;">
+                    <el-button round size="medium" :disabled="loadingMoreDisabled" :loading="loadingMoreStatus" @click="loadingMore">{{loadingMoreText}}</el-button>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/x-template" id="config-tpl">
+        <div class="box" id="config">
+            <div class="header header-black">
+                <div class="left">项目配置</div>
+            </div>
+            <div class="content">
+                <!-- 显示账户余额 -->
+                <!-- 显示合约余额 -->
+
+                <!-- 设置合约文件路径 -->
+                <el-form label-width="100px" style="padding:60px 100px;">
+                    <el-form-item label="合约文件路径">
+                        <el-input v-model="contractPath"></el-input>
+                        <p style="margin: 0px;color:#ccc;">请输入合约文件的绝对路径</p>
+                    </el-form-item>
+                    <el-form-item label="部署参数">
+                        <el-input type="textarea" v-model="args"></el-input>
+                    </el-form-item>
+                    <!-- <el-form-item label="">
+                        <el-checkbox v-model="call_init">执行init方法<span class="tips">(默认会自动检测，即已经执行过init方法后，将不再执行init)</span></el-checkbox>
+                    </el-form-item> -->
+
+                    <el-form-item label="">
+                        <el-checkbox v-model="remove_data">清除合约存储数据
+                            <span class="tips">(将会删除合约存储的所有数据)</span>
+                        </el-checkbox>
+                    </el-form-item>
+
+                    <el-form-item>
+                        <el-button :disabled="!activated" type="primary" @click="saveContractPath()">部署</el-button>
+                    </el-form-item>
+                </el-form>
+
+                <el-form label-width="100px" style="padding:10px 100px;">
+                    <el-form-item label="合约函数">
+                        <el-input v-model="call.func"></el-input>
+                    </el-form-item>
+                    <el-form-item label="发送金额">
+                        <el-input v-model="call.value">
+                            <template slot="append">NAS</template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="合约参数">
+                        <el-input type="textarea" v-model="call.args"></el-input>
+                    </el-form-item>
+                    <el-form-item label="">
+                        <el-checkbox v-model="result2json">result字段解析为JSON</el-checkbox>
+                    </el-form-item>
+                    <el-form-item label="调用结果">
+                        <div v-html="call.result"></div>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="callContract('test')">测试</el-button>
+                        <el-button type="warning" @click="callContract('submit')">提交</el-button>
+                    </el-form-item>
+                </el-form>
+                <!-- 目录说明 -->
+            </div>
+        </div>
+    </script>
+
+    <script type="text/x-template" id="donate-add-tpl">
+        <div class="box" id="donate-add">
+            <div class="header header-black">
+                <div class="left">打赏</div>
+                <div class="right">
+                </div>
+            </div>
+            <div class="content">
+                <el-row>
+                    <el-alert type="error">
+                        <span style="font-size:14px;">打赏时 Chrome 插件钱包请选择使用
+                            <strong style="font-size:16px;padding:0px 5px;">主网</strong>，或使用手机钱包扫描二维码打赏！</span>
+                    </el-alert>
+                    <el-col :span="10" :offset="6">
+                        <el-form :model="donate" :rules="donateAddRule" ref="donate" status-icon label-width="100px" style="margin:50px 0px;">
+                            <el-form-item label="金额" prop="value">
+                                <el-input v-model.number="donate.value">
+                                    <template slot="append">NAS</template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item label="名称" prop="name">
+                                <el-input v-model="donate.name" auto-complete="off"></el-input>
+                            </el-form-item>
+                            <el-form-item label="网址" prop="url">
+                                <el-input v-model="donate.url" auto-complete="off"></el-input>
+                            </el-form-item>
+                            <el-form-item label="描述" prop="content">
+                                <el-input :rows="5" type="textarea" v-model="donate.content"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="submitForm('donate')">打赏</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </el-col>
+                </el-row>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/x-template" id="my-received-donate-tpl">
+        <div class="box" id="my-received-donate" v-loading="donateListLoading">
+            <div class="header header-black">
+                <div class="left">
+                    收到的打赏
+                </div>
+                <div class="right">
+                    <el-button type="primary" @click="$router.push({path:'/donate/add'})" size="mini" icon="el-icon-circle-plus" round>立即打赏</el-button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="blue-color">共收到 {{$eventHub.stat.donateNums}} 人打赏 {{$eventHub.stat.totalDonateNas|fromBasicNas}} NAS</span>
+                </div>
+            </div>
+            <div class="content">
+                <table class="table donate-info">
+                    <tr>
+                        <th style="width: 55%;">打赏人</th>
+                        <th style="width: 30%;">打赏金额</th>
+                        <th style="width: 15%;">打赏时间</th>
+                    </tr>
+                    <tr v-for="item in donateList.donate" :key="item.txhash">
+                        <td class="content">
+                            <a target="blank" :href="item.url" class="hl">{{item.name}}</a>
+                            <div style="color:#666;">{{item.content}}</div>
+                        </td>
+                        <td class="title">{{item.value|fromBasicNas}} NAS</td>
+                        <td class="date">{{item.created|dateFormat}}</td>
+                    </tr>
+                </table>
+                <div style="text-align:center;margin:20px auto;">
+                    <el-button round size="medium" :disabled="noMoreData" :loading="loadingMoreStatus" @click="loadingMore">{{loadingMoreText}}</el-button>
+                </div>
+            </div>
+        </div>
+    </script>
+    <script type="text/x-template" id="about-tpl">
+        <div id="about" class="box">
+            <div class="header" style="color:#333;font-size:17px;font-weight:bold;">Nebulas Cat 星云链DAPP本地开发调试工具</div>
+            <div class="content">
+                <div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/x-template" id="tutorial-tpl">
+        <div id="tutorial" class="box">
+            <div class="header" style="color:#333;font-size:17px;font-weight:bold;">Nebulas Cat 星云链 DAPP 本地开发调试工具</div>
+            <div class="content">
+                <p>欢迎使用 Nebulas Cat 星云链 DAPP 本地开发调试工具，使用过程中遇到任何问题可以到
+                    <a target="_blank" href="https://bbs.forfunapp.com/">链社区</a> 发帖交流。</p>
+                <h3>使用教程</h3>
+                <p>1. 下载
+                    <a target="_blank" href="https://github.com/xiwangzishi/nebulas-cat">Nebulas Cat</a> 源码
+                    <code>git clone https://github.com/xiwangzishi/nebulas-cat.git</code>
+                </p>
+
+                <p>2. 进入 nebulas-cat 文件夹，安装依赖
+                    <code>npm install</code>
+                </p>
+
+                <p>3. 运行工具（合约文件更新后，需要重启调试程序）：</p>
+                <ul>
+                    <li>方法一(推荐)：使用 Visual Studio Code 的调试功能（可以在合约里面下断点）
+                        <code>调试 -> 启动调试</code>
+                        <img style="width:500px;margin:10px;" src="static/images/vsc-step.png" alt="">
+                    </li>
+                    <li>方法二：运行工具
+                        <code>node index.js</code>, 然后直接在合约里面使用 console.log 打印对应信息（会输出到控制台）
+                        <img style="width:500px;margin:10px;" src="static/images/cli-step.png" alt="">
+                    </li>
+                </ul>
+
+                <p>4. 设置chrome 插件钱包为 localhost 网络</p>
+                <img style="width:500px;margin:10px;" src="static/images/chrome-plugin.png" alt="">
+                <p>5. 设置 Neb.js 网络为 localhost 网络
+                    <code>neb.setRequest(new HttpRequest("http://localhost:8685"));</code>
+                </p>
+                <p>6. 设置 NebPay 的 queryPayInfo API callback为 localhost 网络（如果使用了该API，未使用则跳过）
+                    <pre>
+<code style="display:block;">
+    NebPay.queryPayInfo(serialNumber,{
+        callback:'http://localhost:8685/api/pay',
+        listener:undefined
+    })
+</code>
+</pre>
+                </p>
+
+                <p>7. 用浏览器打开 nebulas-cat 目录下的 index.html 后输入
+                    <code>合约文件路径</code>，点击
+                    <code>部署</code>即可使用。</p>
+                <img style="width:500px;margin:10px;" src="static/images/config.png" alt="">
+
+                <h3>原理</h3>
+                <p>其实就是本地起了一个 Web 服务（基于 Koa）,然后实现了 Neb.js 请求节点的一些 API ，假装自己是个记账节点而已。</p>
+                <p>目前实现的 API 有：</p>
+                <ul>
+                    <li>
+                        <code>/v1/user/nebstate</code>
+                    </li>
+                    <li>
+                        <code>/v1/user/call</code>
+                    </li>
+                    <li>
+                        <code>/v1/user/accountstate</code>
+                    </li>
+                    <li>
+                        <code>/v1/user/rawtransaction</code>
+                    </li>
+                    <li>
+                        <code>/v1/user/getTransactionReceipt</code>
+                    </li>
+                    <li>
+                        <code>/v1/user/getEventsByHash</code>
+                    </li>
+                    <li>NebPay：
+                        <code>/api/pay</code>
+                    </li>
+                    <li>NebPay：
+                        <code>/api/pay/query</code>
+                    </li>
+                </ul>
+                <p>点击部署按钮，就是把输入的合约文件路径 require 进来作为 Node.js 的一个模块，然后 Neb.js 的请求都是直接调用合约实例的方法，所以可以直接利用 Visual Studio Code 来调试合约功能（理论上其他 IDE 也可以，自行摸索！）。具体的源码都在 index.js 中</p>
+                <p>本项目使用了一些官方
+                    <a href="https://github.com/nebulasio/neb.js/tree/feature/nvm">NVM</a> 调试工具的一些源码</p>
+                <p>联系我：d2VjaGF0Onphbmtibw==</p>
+            </div>
+        </div>
+    </script>
+
+
+
+    <script src="dist/nebulas.js"></script>
+    <script src="dist/nebPay.js"></script>
+    <script src="static/js/index.js?_=201805312100"></script>
+</body>
+
+</html>

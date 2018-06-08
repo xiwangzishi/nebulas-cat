@@ -1,2 +1,2 @@
-rm -rf nvm/.storage
+rm -rf ./data/storage
 rm -rf .init
