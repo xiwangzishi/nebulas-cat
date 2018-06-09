@@ -362,6 +362,14 @@ router.post('/_api/contract/path', (ctx, next) => {
         msg: "success"
     }
 })
+// contractMethods
+router.get('/_api/contract/methods', (ctx, next) => {
+    ctx.body = {
+        status_code: 200,
+        msg: "",
+        data: nvm.contractMethods()
+    }
+})
 
 // app.use(async(ctx, next) => {
 // console.log(ctx)

@@ -349,6 +349,12 @@ var DonateAddComponent = {
 var ConfigComponent = {
     template: "#config-tpl",
     methods: {
+        getContractMethods: function () {
+            var _this = this;
+            this.$http.get('http://localhost:8685/_api/contract/methods').then(function (resp) {
+                _this.contractMethods = resp.data.data
+            })
+        },
         checkActivation: function () {
             var _this = this;
             this.$http.get('http://localhost:8685/_api/checkActivation').then(function (resp) {
@@ -372,7 +378,7 @@ var ConfigComponent = {
                         successFunc: function (resp) {
                             _this.activated = true
                             _this.$http.post('http://localhost:8685/_api/checkActivation', {
-                                params:resp
+                                params: resp
                             }).then(function (rsp) {
                                 location.reload()
                             })
@@ -438,6 +444,7 @@ var ConfigComponent = {
             }
         },
         saveContractPath: function () {
+            var _this = this;
             if (!this.contractPath) {
                 this.$message.error("请输入合约文件路径")
                 return false
@@ -455,26 +462,34 @@ var ConfigComponent = {
                 args: this.args,
                 call_init: this.call_init,
                 remove_data: this.remove_data,
-            }).then(({
-                data: {
-                    status_code,
-                    msg
-                }
-            }) => {
+            }).then(function (resp) {
+                var data = resp.data,
+                    status_code = data.status_code,
+                    msg = data.msg;
                 if (status_code != 200) {
-                    this.$message.error(msg)
+                    _this.$message.error(msg)
                     return
                 }
-                this.$message.success("部署成功")
+                _this.contractMethods = []
+                
+                _this.call.func = ""
+                _this.call.value = 0
+                _this.call.args = '[]'
+                _this.call.result = ""
+
+                _this.getContractMethods()
+                _this.$message.success("部署成功")
             })
         }
     },
     created: function () {
         this.checkActivation()
+        this.getContractMethods()
     },
     data: function () {
         return {
             activated: false,
+            contractMethods: [],
             call: {
                 func: "",
                 value: 0,

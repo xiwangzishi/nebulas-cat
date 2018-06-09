@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nebulas Cat 星云智能合约本地开发调试工具</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-ui@2.3.7/lib/theme-chalk/index.css">
-    <link rel="stylesheet" href="static/css/style.css?_=1.0.5">
+    <link rel="stylesheet" href="static/css/style.css?_=1.0.6">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.2.6/dist/vue.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-router@3.0.1/dist/vue-router.min.js"></script>
@@ -65,7 +65,8 @@
         </nav>
         <div class="container" id="container">
             <div style="text-align:center;padding-left:20px;">
-                <el-alert type="error" class="noExtension" id="noExtension" v-if="location.host.search('forfunapp')!=-1">
+                <!-- location.host.search('forfunapp')!=-1 -->
+                <el-alert type="error" class="noExtension" id="noExtension" v-if="false">
                     请将该工具下载到本地使用！该工具除了打赏功能外，不能在线上使用！
                 </el-alert>
                 <el-alert type="warning" class="noExtension" id="noExtension">
@@ -150,8 +151,8 @@
                 <!-- 设置合约文件路径 -->
                 <el-form label-width="100px" style="padding:60px 100px;">
                     <el-form-item label="合约文件路径">
-                        <el-input v-model="contractPath"></el-input>
-                        <p style="margin: 0px;color:#ccc;">请输入合约文件的绝对路径</p>
+                        <el-input id="contractPath" v-model="contractPath"></el-input>
+                        <p style="margin: 0px;color:#ccc;">请输入合约文件的绝对路径，示例：/Users/nebulas-cat/smartContract/nebulas-cat.js</p>
                     </el-form-item>
                     <el-form-item label="部署参数">
                         <el-input type="textarea" v-model="args"></el-input>
@@ -173,10 +174,13 @@
 
                 <el-form label-width="100px" style="padding:10px 100px;">
                     <el-form-item label="合约函数">
-                        <el-input v-model="call.func"></el-input>
+                       <el-input v-model="call.func"></el-input>
+                      <el-radio-group v-model="call.func" size="mini" id="contractMethods">
+                        <el-radio-button :label="item" v-for="item in contractMethods"></el-radio-button>
+                    </el-radio-group>
                     </el-form-item>
                     <el-form-item label="发送金额">
-                        <el-input v-model="call.value">
+                        <el-input v-model="call.value" style="width:194px;">
                             <template slot="append">NAS</template>
                         </el-input>
                     </el-form-item>
@@ -220,10 +224,10 @@
                                 </el-input>
                             </el-form-item>
                             <el-form-item label="名称" prop="name">
-                                <el-input v-model="donate.name" auto-complete="off"></el-input>
+                                <el-input v-model="donate.name"></el-input>
                             </el-form-item>
                             <el-form-item label="网址" prop="url">
-                                <el-input v-model="donate.url" auto-complete="off"></el-input>
+                                <el-input v-model="donate.url"></el-input>
                             </el-form-item>
                             <el-form-item label="描述" prop="content">
                                 <el-input :rows="5" type="textarea" v-model="donate.content"></el-input>
@@ -371,7 +375,7 @@
 
     <script src="dist/nebulas.js"></script>
     <script src="dist/nebPay.js"></script>
-    <script src="static/js/index.js?_=201805312100"></script>
+    <script src="static/js/index.js?_=201806092300"></script>
 </body>
 
 </html>

@@ -785,3 +785,11 @@ a {
     padding: 3px 5px;
     border-radius: 2px;
 }
+#contractMethods .el-radio-button {
+    margin-top: 5px;
+}
+#contractMethods .el-radio-button__inner{
+    border:none;
+    padding: 5px 15px;
+    border-right: 1px solid #dcdfe6;
+}

@@ -15,8 +15,6 @@ var NVM = function (block, transaction) {
 
 var contract = null
 
-// console.log(util.makeTxHash())
-
 NVM.prototype = {
     deploy: function (contract_file, args) {
         var Contract = require(contract_file);
@@ -36,7 +34,14 @@ NVM.prototype = {
             throw new Error(error)
         }
     },
+    contractMethods: function () {
 
+        var methods = Object.getOwnPropertyNames(Object.getPrototypeOf(contract));
+
+        return methods.sort().filter(function (e, i, arr) {
+            if (e[0] != "_" && e != "init" && e != arr[i + 1] && typeof contract[e] == 'function') return true;
+        });
+    },
     call: function (func, args, trans, block) {
         if (funcRegex.test(func)) {
             return this.run(func, args, trans, block);
