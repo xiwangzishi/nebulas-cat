@@ -32,6 +32,9 @@ var transaction = {
 };
 
 // path.join(__dirname, "./bbs.js");
+if (!fs.existsSync("./data/contract_path")) {
+    fs.writeFileSync("./data/contract_path","")
+}
 var contract_file = fs.readFileSync("./data/contract_path").toString()
 
 if (!fs.existsSync(contract_file)) {
