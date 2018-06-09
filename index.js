@@ -31,6 +31,11 @@ var transaction = {
     gasLimit: "20000"
 };
 
+var contractBalanceFile =  './data/balance/contract'
+if (!fs.existsSync(contractBalanceFile)) {
+    fs.writeFileSync(contractBalanceFile,'{"balance":0,"nonce":0,"type":88}')
+}
+
 // path.join(__dirname, "./bbs.js");
 if (!fs.existsSync("./data/contract_path")) {
     fs.writeFileSync("./data/contract_path","")
@@ -49,26 +54,7 @@ var nvm = new NVM();
 
 var deploy = nvm.deploy(contract_file, "[]");
 
-// var result = nvm.call("setAds", JSON.stringify([
-//     [{
-//         "img": "https://wx2.sinaimg.cn/mw690/5065f17agy1frdaxosc2aj20dw08c40i.jpg",
-//         "title": "星云DAPP商品",
-//         "url": "http://nebulas.cool/?from=forfunapp"
-//     }, {
-//         "img": "https://wx3.sinaimg.cn/mw690/5065f17agy1frz3k10hgcj20jg05kwei.jpg",
-//         "title": "应用分发",
-//         "url": "http://nas.yuxizhe.top"
-//     }, {
-//         "img": "https://wx1.sinaimg.cn/mw690/5065f17agy1frvz9nj8wlj20b405kdgj.jpg",
-//         "title": "http://dpark.cc/",
-//         "url": "http://dpark.cc/"
-//     }, {
-//         "img": "https://wx4.sinaimg.cn/mw690/5065f17agy1frne7vnydvj20b405kjr8.jpg",
-//         "title": "NAS水龙头",
-//         "url": "https://nas.biyouduo.com"
-//     }]
-// ]), transaction);
-
+// 这里可以使用 call 来调用一些方法来初始化数据
 // nvm.call("setAds", JSON.stringify([[]]))
 
 var nebulas = require("nebulas")
