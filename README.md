@@ -23,10 +23,10 @@
 
 <p>4. 设置chrome 插件钱包为 localhost 网络</p>
 <img style="width:500px;margin:10px;" src="static/images/chrome-plugin.png" alt="">
-<p>5. 设置 Neb.js 网络为 localhost 网络
+<p>5. 设置 Neb.js 网络为 localhost 网络（在你 DAPP 的 JS 代码中设置）
     <code>neb.setRequest(new HttpRequest("http://localhost:8685"));</code>
 </p>
-<p>6. 设置 NebPay 的 queryPayInfo API callback为 localhost 网络（如果使用了该API，未使用则跳过）
+<p>6. 设置 NebPay 的 queryPayInfo API callback为 localhost 网络（如果未使用该API则跳过，此处在你 DAPP 的 JS 代码中 NebPay.queryPayInfo 处设置）
     <pre>
 <code style="display:block;">
 NebPay.queryPayInfo(serialNumber,{

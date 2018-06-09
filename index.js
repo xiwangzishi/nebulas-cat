@@ -128,7 +128,7 @@ router.post('/v1/user/call', (ctx, next) => {
 
     try {
         var call_result = nvm.call(reqBody.contract.function, reqBody.contract.args, trans, block)
-        result.result = call_result == undefined ? '""' : JSON.stringify(result)
+        result.result = call_result == undefined ? '""' : JSON.stringify(call_result)
     } catch (e) {
         // {"result":"Error: 403","execute_err":"Call: Error: 403","estimate_gas":"20378"}
         result.execute_err = "Call: Error: " + e.message
