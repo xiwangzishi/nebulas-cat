@@ -1,3 +1,4 @@
+<a href="https://github.com/xiwangzishi/nebulas-cat/blob/master/README-EN.md">English</a>
 <p>欢迎使用 Nebulas Cat 星云链 DAPP 本地开发调试工具，使用过程中遇到任何问题可以到 <a target="_blank" href="https://bbs.forfunapp.com/">链社区</a> 发帖交流。</p>
 <h3>使用教程</h3>
 <p>1. 下载
