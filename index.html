@@ -71,14 +71,13 @@
         <div class="container" id="container">
             <div style="text-align:center;padding-left:20px;">
                 <!-- location.host.search('forfunapp')!=-1 -->
-                <el-alert type="error" class="noExtension" id="noExtension" v-if="false">
+                <el-alert type="error" class="noExtension" v-if="false">
                     请将该工具下载到本地使用！该工具除了打赏功能外，不能在线上使用！
                 </el-alert>
-                <el-alert type="warning" class="noExtension" id="noExtension">
+                <el-alert type="warning" class="noExtension">
                     {{$t("submitDAppTips")}}
                 </el-alert>
-                <el-alert type="error" class="noExtension" id="noExtension" v-if="noExtension">
-                    {{$t("noExtension")}}
+                <el-alert type="error" class="noExtension" id="noExtension" v-if="noExtension" v-html="$t('noExtension')">
                 </el-alert>
             </div>
             <el-row style="padding-top: 5px;">
