@@ -237,7 +237,7 @@ var MyReceivedDonateComponent = {
 
                 _this.loadingMoreStatus = false
                 _this.donateListLoading = false
-                _this.loadingMoreText = "加载更多"
+                _this.loadingMoreText = _this.$t('loadMore')
 
                 var result = JSON.parse(resp.result)
 
@@ -248,7 +248,7 @@ var MyReceivedDonateComponent = {
 
                 if (result.noMore) {
                     _this.noMoreData = true
-                    _this.loadingMoreText = "没有更多数据"
+                    _this.loadingMoreText = _this.$t('noMoreData')
                 }
             })
 
@@ -471,7 +471,7 @@ var ConfigComponent = {
                     return
                 }
                 _this.contractMethods = []
-                
+
                 _this.call.func = ""
                 _this.call.value = 0
                 _this.call.args = '[]'
@@ -774,7 +774,7 @@ var defaultData = {
     }
 }
 
-
+var locale = JSON.parse(localStorage.getItem("locale")||'{"locale":"en","name":"English"}')
 
 var Main = {
     router: router,
@@ -782,6 +782,10 @@ var Main = {
 
     },
     methods: {
+        changeLocal:function (item) {
+            localStorage.setItem("locale", JSON.stringify(item))
+            location.reload()
+        },
         changChain: function (chain) {
             if (chain == "mainnet") {
                 this.chainStr = "主网"
@@ -842,6 +846,8 @@ var Main = {
         defaultData.address = address
         defaultData.menuStatus = false
         defaultData.noExtension = typeof (webExtensionWallet) === "undefined"
+        
+        defaultData.locale = locale
         return defaultData
     }
 }
@@ -890,8 +896,16 @@ Vue.filter("fromBasicNas", function (value) {
 defaultData.nebState = state
 
 
+
+var i18n = new VueI18n({
+    locale: locale.locale, // set locale
+    messages, // set locale messages
+  })
+  
+  
+
 cls = Vue.extend(Main)
-app = new cls()
+app = new cls({i18n:i18n})
 
 getWallectInfo()
 

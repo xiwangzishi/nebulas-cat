@@ -22,7 +22,8 @@ NVM.prototype = {
 
         var exists = fs.existsSync(".init")
         if (exists) {
-            console.log("该合约已经部署，重新部署 / 清除数据 / 重新执行合约init方法 请执行项目目录下的 reset.sh")
+            // console.log("该合约已经部署，重新部署 / 清除数据 / 重新执行合约init方法 请执行项目目录下的 reset.sh")
+            console.log("The contract has been deployed, redeploy / clear data / re-call the contract init method Please execute reset.sh in the project directory")
             return
         }
 

@@ -45,7 +45,7 @@ var contract_file = fs.readFileSync("./data/contract_path").toString()
 if (!fs.existsSync(contract_file)) {
     contract_file = path.join(__dirname, "./smartContract/nebulas-cat.js");
 }
-console.log("加载的合约文件：", contract_file)
+console.log("require contract file：", contract_file)
 var NVM = require('./nvm/nvm')
 
 Blockchain.blockParse(JSON.stringify(util.makeBlock()));
