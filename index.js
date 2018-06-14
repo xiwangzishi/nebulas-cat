@@ -14,6 +14,13 @@ global.jsDate = jsDate
 global.jsMathRandom = Math.random
 global.BASE_PATH = __dirname
 
+var NVM = require('./nvm/nvm')
+var Transaction = require("nebulas/lib/transaction")
+
+var nvm = new NVM();
+
+Blockchain.blockParse(JSON.stringify(util.makeBlock()));
+
 var app = new Koa();
 // var block = {
 //     timestamp: 0,
@@ -44,7 +51,12 @@ if (!fs.existsSync(contractPathVal)) {
 }
 
 function readContractFilePath() {
-    var conf = JSON.parse(fs.readFileSync(contractPathVal))
+    var conf 
+    try {
+        conf = JSON.parse(fs.readFileSync(contractPathVal))   
+    } catch (error) {
+        conf = {"path":"","args":"[]"}
+    }
     return conf
 }
 
@@ -54,12 +66,6 @@ var contract_conf = readContractFilePath(),
 // if (!fs.existsSync(contract_file)) {
 //     contract_file = path.join(__dirname, "./smartContract/nebulas-cat.js");
 // }
-
-var NVM = require('./nvm/nvm')
-
-Blockchain.blockParse(JSON.stringify(util.makeBlock()));
-
-var nvm = new NVM();
 
 // nvm.deploy(contract_file, contract_conf.args);
 
@@ -113,10 +119,6 @@ watchContractContent(contract_file)
 
 // 这里可以使用 call 来调用一些方法来初始化数据
 // nvm.call("setAds", JSON.stringify([[]]))
-
-var nebulas = require("nebulas")
-
-var Transaction = nebulas.Transaction;
 
 app.use(cors())
 app.use(bodyParser());
