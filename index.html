@@ -293,15 +293,23 @@
                 <p>2. Enter the folder "nebulas-cat"，install the dependent files
                     <code>npm install</code>
                 </p>
-
-                <p>3. How to run（You need to restart the tool or debug program after updating contract files）：</p>
-                <ul>
+                <!-- （You need to restart the tool or debug program after updating contract files） -->
+                <p>3. How to run：</p>
+                <ul style="margin-left:30px;">
                     <li>Method 1(Recommended)：Use the debug function in Visual Studio Code（can use break point）
-                        <code>Debug -> Start Debugging</code>
-                        <img style="width:500px;margin:10px;" src="static/images/vsc-step-en.png" alt="">
+                        <ul style="margin-left:30px;margin-top:10px;">
+                            <li>3.1.1 Open the "nebulas-cat" folder with Visual Studio Code
+                                <p style="color:#F56C6C;">Note: Open the "nebulas-cat" folder, not your project folder</p>
+                            </li>
+                            <li>
+                                <p>3.1.2 <code>Debug -> Start Debugging</code></p>
+                                <p><img style="width:500px;margin:10px;" src="static/images/vsc-step-en.png" alt="">
+                                </p>
+                            </li>
+                        </ul>
                     </li>
-                    <li>Method 2: Run the tool
-                        Execute command <code>node index.js</code>, then use console.log in contract file to print info（will output to terminal console）
+                    <li>Method 2: 
+                        <p>Enter the folder "nebulas-cat", Execute command <code>node index.js</code>, then use console.log in contract file to print info（will output to terminal console）</p>
                         <img style="width:500px;margin:10px;" src="static/images/cli-step-en.png" alt="">
                     </li>
                 </ul>
@@ -381,14 +389,23 @@
                     <code>npm install</code>
                 </p>
 
-                <p>3. 运行工具（合约文件更新后，需要重启调试程序）：</p>
+                <p>3. 运行工具（合约文件更新后，会自动重新载入新的合约代码）：</p>
                 <ul>
                     <li>方法一(推荐)：使用 Visual Studio Code 的调试功能（可以在合约里面下断点）
-                        <code>调试 -> 启动调试</code>
-                        <img style="width:500px;margin:10px;" src="static/images/vsc-step.png" alt="">
+                        <ul style="margin-left:30px;margin-top:10px;">
+                            <li>3.1.1 使用 Visual Studio Code 打开 nebulas-cat 文件夹
+                                <p style="color:#F56C6C;">注意：打开的是 nebulas-cat 文件夹，不是你自己的项目文件夹</p>
+                            </li>
+                            <li>
+                                <p>3.1.2 <code>调试 -> 启动调试</code></p>
+                                <p><img style="width:500px;margin:10px;" src="static/images/vsc-step.png" alt="">
+                                </p>
+                            </li>
+                        </ul>
+                        
                     </li>
-                    <li>方法二：运行工具
-                        <code>node index.js</code>, 然后直接在合约里面使用 console.log 打印对应信息（会输出到控制台）
+                    <li>方法二：
+                        进入 <strong>nebulas-cat</strong> 文件夹，执行 <code>node index.js</code>, 然后直接在合约里面使用 console.log 打印对应信息（会输出到控制台）
                         <img style="width:500px;margin:10px;" src="static/images/cli-step.png" alt="">
                     </li>
                 </ul>

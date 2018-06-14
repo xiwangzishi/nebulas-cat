@@ -362,10 +362,10 @@ var ConfigComponent = {
                     _this.activated = true
                     return
                 }
-                _this.$confirm('检测你还没有激活此工具，请激活后使用！<p style="color:#F00;">激活时，插件钱包请选择主网！</p><p style="color:#F00;">激活时，插件钱包请选择主网！</p><p style="color:#F00;">激活时，插件钱包请选择主网！</p>', '激活提示', {
+                _this.$confirm(_this.$t('activateTips'), _this.$t('activateTipsTitle'), {
                     dangerouslyUseHTMLString: true,
-                    confirmButtonText: '立即激活',
-                    cancelButtonText: '取消',
+                    confirmButtonText: _this.$t('activateNow'),
+                    cancelButtonText: _this.$t('cancel'),
                     type: 'warning'
                 }).then(function () {
                     var data = {
@@ -374,7 +374,7 @@ var ConfigComponent = {
                         func: "activation",
                         data: [],
                         context: _this,
-                        successMsg: "激活成功",
+                        successMsg: _this.$t('activateSuccess'),
                         successFunc: function (resp) {
                             _this.activated = true
                             _this.$http.post('http://localhost:8685/_api/checkActivation', {
@@ -394,10 +394,14 @@ var ConfigComponent = {
                     _this.$eventHub.$emit("nebPayCall", data)
 
 
-                }).catch(function () {
-
+                    }).catch(function () {
+                    
                 });
 
+            }).catch(function (err) {
+                if (err.message == "Network Error") {
+                    _this.$message.error(_this.$t('startupToolTips'))
+                }
             })
         },
         callContract: function (action) {
@@ -405,7 +409,7 @@ var ConfigComponent = {
             try {
                 callArgs = JSON.parse(this.call.args)
             } catch (e) {
-                this.$message.error("合约参数不是一个正确的 JSON 格式")
+                this.$message.error(this.$t('jsonFormatError'))
                 return
             }
             var _this = this
@@ -435,7 +439,7 @@ var ConfigComponent = {
                     func: this.call.func,
                     data: callArgs,
                     context: _this,
-                    successMsg: "提交成功",
+                    successMsg: _this.$t('submitSuccess'),
                     successFunc: function (resp) {
 
                     },
@@ -446,13 +450,13 @@ var ConfigComponent = {
         saveContractPath: function () {
             var _this = this;
             if (!this.contractPath) {
-                this.$message.error("请输入合约文件路径")
+                this.$message.error(_this.$t('contractFileTips'))
                 return false
             }
             try {
                 JSON.parse(this.args)
             } catch (error) {
-                this.$message.error("部署参数错误，不是一个有效的json格式")
+                this.$message.error(_this.$t('deployJsonFormatError'))
                 return false
             }
 
@@ -478,7 +482,7 @@ var ConfigComponent = {
                 _this.call.result = ""
 
                 _this.getContractMethods()
-                _this.$message.success("部署成功")
+                _this.$message.success(_this.$t('deploySuccess'))
             })
         }
     },
@@ -594,8 +598,8 @@ Vue.prototype.$eventHub = new Vue({
                     // console.log(value)
                     if (typeof value == 'string') {
                         _this.$notify({
-                            title: '错误',
-                            message: '用户取消了交易！',
+                            title: _this.$t('error'),
+                            message: _this.$t('rejectError'),
                             duration: 3000,
                             type: 'error'
                         });
@@ -606,8 +610,8 @@ Vue.prototype.$eventHub = new Vue({
                     config.txhash = value.txhash
 
                     config.transStateNotify = _this.$notify({
-                        title: '正在获取交易状态',
-                        message: '如你不想等待状态查询，可点击关闭按钮。稍后刷新页面查看最新信息！',
+                        title: _this.$t('getTransStatus'),
+                        message: _this.$t('getTransStatusTips'),
                         duration: 0,
                         type: 'warning'
                     });
@@ -628,7 +632,7 @@ Vue.prototype.$eventHub = new Vue({
                 options
             );
 
-            console.log("生成的serialNumber：", serialNumber)
+            // console.log("生成的serialNumber：", serialNumber)
         },
         checkTransaction: function (config) {
             // var config = {
@@ -673,7 +677,7 @@ Vue.prototype.$eventHub = new Vue({
                         if (config.successMsg) {
                             // context.$message.success(config.successMsg)
                             context.$notify({
-                                title: '操作成功',
+                                title: context.$t('operationSuccess'),
                                 message: config.successMsg,
                                 type: 'success'
                             });
@@ -704,13 +708,13 @@ Vue.prototype.$eventHub = new Vue({
                         }
                     }
                 }).catch(function (err) {
-                    context.$message.error("查询交易结果发生了错误！" + err)
+                    context.$message.error(context.$t('getTransErr') + err)
                 });
             }, intervalTime * 1000)
             timeOutId = setTimeout(function () {
                 config.transStateNotify.close()
                 if (timerId) {
-                    context.$message.error("查询超时！请稍后刷新页面查看最新内容！")
+                    context.$message.error(context.$t('getTransTimeout'))
                     clearInterval(timerId)
                 }
             }, timeOut * 1000)

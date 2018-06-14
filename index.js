@@ -3,7 +3,7 @@ var path = require("path");
 
 var Koa = require('koa');
 var Router = require('koa-router');
-var cors = require('koa-cors');
+var cors = require('@koa/cors');
 var bodyParser = require('koa-bodyparser');
 
 var util = require('./util')
@@ -20,48 +20,103 @@ var app = new Koa();
 //     height: 1
 // };
 
-var transaction = {
-    hash: "",
-    from: "n1Et8GL1cszLkzRUxPe14pRcdo5hbpZpCrP",
-    to: "n1Et8GL1cszLkzRUxPe14pRcdo5hbpZpCrP",
-    value: "0",
-    nonce: 1,
-    timestamp: 1527077193,
-    gasPrice: "1000000",
-    gasLimit: "20000"
-};
+// var transaction = {
+//     hash: "",
+//     from: "n1Et8GL1cszLkzRUxPe14pRcdo5hbpZpCrP",
+//     to: "n1Et8GL1cszLkzRUxPe14pRcdo5hbpZpCrP",
+//     value: "0",
+//     nonce: 1,
+//     timestamp: 1527077193,
+//     gasPrice: "1000000",
+//     gasLimit: "20000"
+// };
 
-var contractBalanceFile =  './data/balance/contract'
+var contractBalanceFile = './data/balance/contract'
 if (!fs.existsSync(contractBalanceFile)) {
-    fs.writeFileSync(contractBalanceFile,'{"balance":0,"nonce":0,"type":88}')
+    fs.writeFileSync(contractBalanceFile, '{"balance":0,"nonce":0,"type":88}')
 }
 
 // path.join(__dirname, "./bbs.js");
-if (!fs.existsSync("./data/contract_path")) {
-    fs.writeFileSync("./data/contract_path","")
-}
-var contract_file = fs.readFileSync("./data/contract_path").toString()
+var contractPathVal = "./data/contract_path"
 
-if (!fs.existsSync(contract_file)) {
-    contract_file = path.join(__dirname, "./smartContract/nebulas-cat.js");
+if (!fs.existsSync(contractPathVal)) {
+    fs.writeFileSync(contractPathVal, '{"path":"","args":"[]"}')
 }
-console.log("require contract file：", contract_file)
+
+function readContractFilePath() {
+    var conf = JSON.parse(fs.readFileSync(contractPathVal))
+    return conf
+}
+
+var contract_conf = readContractFilePath(),
+    contract_file = contract_conf.path;
+
+// if (!fs.existsSync(contract_file)) {
+//     contract_file = path.join(__dirname, "./smartContract/nebulas-cat.js");
+// }
+
 var NVM = require('./nvm/nvm')
 
 Blockchain.blockParse(JSON.stringify(util.makeBlock()));
 
 var nvm = new NVM();
 
-var deploy = nvm.deploy(contract_file, "[]");
+// nvm.deploy(contract_file, contract_conf.args);
+
+function reDeployContract(contract_path, args) {
+    var contract_abspath = path.resolve(contract_path)
+    if (!fs.existsSync(contract_abspath)) {
+        return false
+    }
+
+    // fs.writeFileSync(contractPathVal, contract_abspath)
+
+    delete require.cache[contract_abspath]
+
+    nvm.deploy(contract_abspath, args);
+}
+
+
+function watchContractPathVal(val_path) {
+    // console.log(val_path)
+    fs.watchFile(val_path, function (curr, prev) {
+        var contract_conf = readContractFilePath(),
+            contract_file = contract_conf.path;
+        if (!contract_file) {
+            return 
+        }
+        
+        reDeployContract(contract_file,contract_conf.args)
+        watchContractContent(contract_file)
+    })
+}
+watchContractPathVal(contractPathVal)
+
+var fsWatcher = {}
+
+function watchContractContent(contract_file) {
+    if (!contract_file || !fs.existsSync(contract_file)) {
+        return 
+    }
+    
+    if (fsWatcher[contract_file]) {
+        return
+    }
+    
+    fsWatcher[contract_file] = fs.watchFile(contract_file, function (curr, prev) {
+        reDeployContract(contract_file)
+    })
+}
+watchContractContent(contract_file)
+
+// fsWatcher.close()
 
 // 这里可以使用 call 来调用一些方法来初始化数据
 // nvm.call("setAds", JSON.stringify([[]]))
 
 var nebulas = require("nebulas")
 
-var Account = nebulas.Account,
-    Transaction = nebulas.Transaction;
-
+var Transaction = nebulas.Transaction;
 
 app.use(cors())
 app.use(bodyParser());
@@ -200,7 +255,7 @@ router.post('/v1/user/rawtransaction', (ctx, next) => {
         "status": 2, // 交易状态结果： 0 failed失败, 1 success成功, 2 pending确认中.
         "gas_used": "20000",
         "execute_error": "",
-        "execute_result":'""'
+        "execute_result": '""'
     }
     try {
 
@@ -328,9 +383,13 @@ router.post('/_api/contract/path', (ctx, next) => {
         return
     }
 
-    fs.writeFileSync("./data/contract_path", contract_abspath)
+    var contract_conf = JSON.stringify({ "path": contract_abspath, "args": reqBody.args })
+    
+    //写入文件后会自动重新部署
+    fs.writeFileSync(contractPathVal, contract_conf)
+
     // 删除缓存，重新部署一下
-    delete require.cache[contract_abspath]
+    // delete require.cache[contract_abspath]
 
     if (reqBody.remove_data) {
 
@@ -341,7 +400,7 @@ router.post('/_api/contract/path', (ctx, next) => {
         fs.unlinkSync(".init")
 
     }
-    nvm.deploy(contract_abspath, reqBody.args);
+    // nvm.deploy(contract_abspath, reqBody.args);
 
     ctx.body = {
         status_code: 200,

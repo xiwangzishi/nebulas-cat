@@ -17,12 +17,13 @@ var contract = null
 
 NVM.prototype = {
     deploy: function (contract_file, args) {
+        console.log("require contract file：", contract_file)
+
         var Contract = require(contract_file);
         contract = new Contract();
 
         var exists = fs.existsSync(".init")
         if (exists) {
-            // console.log("该合约已经部署，重新部署 / 清除数据 / 重新执行合约init方法 请执行项目目录下的 reset.sh")
             console.log("The contract has been deployed, redeploy / clear data / re-call the contract init method Please execute reset.sh in the project directory")
             return
         }
@@ -36,7 +37,9 @@ NVM.prototype = {
         }
     },
     contractMethods: function () {
-
+        if (!contract) {
+            return []
+        }
         var methods = Object.getOwnPropertyNames(Object.getPrototypeOf(contract));
 
         return methods.sort().filter(function (e, i, arr) {

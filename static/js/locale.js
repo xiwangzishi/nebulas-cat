@@ -32,7 +32,24 @@ var messages = {
         donateTime: 'Donation time',
         tutorialTitle:'Nebulas Cat - a local development and debugging tool for Nebulas dapp',
         loadMore:'Load more',
-        noMoreData:'No more data'
+        noMoreData:'No more data',
+        activateTips: 'Detect that you haven\'t activated this tool yet. Please activate it and use it!' + '<p style="color:#F00;">please select the mainnet in wallet plugin!</p>'.repeat(3),
+        activateTipsTitle: 'Activate Tips',
+        cancel: 'Cancel',
+        activateNow: 'Activate now',
+        activateSuccess: 'Activate Success',
+        jsonFormatError: 'Contract parameter is not a correct JSON format', 
+        submitSuccess: 'Submit success',
+        deployJsonFormatError: 'Deploy parameter is not a correct JSON format',
+        deploySuccess: 'Deploy success',
+        error: 'Error',
+        rejectError: 'User reject the transaction',
+        getTransStatus: 'Getting transaction status',
+        getTransStatusTips: 'If you do not want to wait for a status query, click the Close button, Refresh the page later to see the latest information!',
+        getTransTimeout: 'Query timeout! Please refresh the page later to check the latest information!',
+        getTransErr:'There was an error in the query transaction result!',
+        operationSuccess: 'Operation success',
+        startupToolTips:'It is detected that you have not startup the "nebulas-cat" tool. Please use it after startup!'
     },
     zh: {
         project: "项目",
@@ -67,7 +84,24 @@ var messages = {
         donateTime: '打赏时间',
         tutorialTitle:'Nebulas Cat 星云链 DAPP 本地开发调试工具',
         loadMore:'加载更多',
-        noMoreData:'没有更多数据'
+        noMoreData: '没有更多数据',
+        activateTips: '检测你还没有激活此工具，请激活后使用！' + '<p style="color:#F00;">激活时，插件钱包请选择主网！</p>'.repeat(3),
+        activateTipsTitle: '激活提示',
+        cancel: '取消',
+        activateNow: '立即激活',
+        activateSuccess: '激活成功',
+        jsonFormatError: '合约参数不是一个正确的 JSON 格式', //Contract parameter is not a correct JSON format
+        submitSuccess: '提交成功',
+        deployJsonFormatError: '部署参数错误，不是一个有效的json格式',
+        deploySuccess: '部署成功',
+        error: '错误',
+        rejectError: '用户取消了交易！',
+        getTransStatus: '正在获取交易状态',
+        getTransStatusTips: '如你不想等待状态查询，可点击关闭按钮。稍后刷新页面查看最新信息！',
+        getTransTimeout: '查询超时！请稍后刷新页面查看最新内容！',
+        getTransErr:'查询交易结果发生了错误！',
+        operationSuccess: '操作成功',
+        startupToolTips:'检测到你还没有启动 nebulas-cat 工具，请启动后使用！'
     }
 }
 
