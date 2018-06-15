@@ -51,11 +51,14 @@ if (!fs.existsSync(contractPathVal)) {
 }
 
 function readContractFilePath() {
-    var conf 
+    var conf
     try {
-        conf = JSON.parse(fs.readFileSync(contractPathVal))   
+        conf = JSON.parse(fs.readFileSync(contractPathVal))
     } catch (error) {
-        conf = {"path":"","args":"[]"}
+        conf = {
+            "path": "",
+            "args": "[]"
+        }
     }
     return conf
 }
@@ -82,18 +85,31 @@ function reDeployContract(contract_path, args) {
     nvm.deploy(contract_abspath, args);
 }
 
+var contractPathChangedLock = false,
+    watchFileChanged = false;
+
+function contractPathChanged(curr, prev) {
+    var contract_conf = readContractFilePath(),
+        contract_file = contract_conf.path;
+    
+    if (watchFileChanged && contractPathChangedLock) {
+        contractPathChangedLock = false
+        return 
+    }
+    if (!contract_file) {
+        return
+    }
+
+
+    reDeployContract(contract_file, contract_conf.args)
+    watchContractContent(contract_file)
+}
 
 function watchContractPathVal(val_path) {
     // console.log(val_path)
-    fs.watchFile(val_path, function (curr, prev) {
-        var contract_conf = readContractFilePath(),
-            contract_file = contract_conf.path;
-        if (!contract_file) {
-            return 
-        }
-        
-        reDeployContract(contract_file,contract_conf.args)
-        watchContractContent(contract_file)
+    fs.watchFile(val_path, function () {
+        watchFileChanged = true
+        contractPathChanged()
     })
 }
 watchContractPathVal(contractPathVal)
@@ -102,13 +118,22 @@ var fsWatcher = {}
 
 function watchContractContent(contract_file) {
     if (!contract_file || !fs.existsSync(contract_file)) {
-        return 
+        return
     }
-    
+
     if (fsWatcher[contract_file]) {
         return
     }
-    
+
+    for (var k in fsWatcher) {
+        var watcher = fsWatcher[k];
+        if (!watcher) {
+            continue
+        }
+        fs.unwatchFile(k)
+        delete fsWatcher[k];
+    }
+
     fsWatcher[contract_file] = fs.watchFile(contract_file, function (curr, prev) {
         reDeployContract(contract_file)
     })
@@ -385,10 +410,16 @@ router.post('/_api/contract/path', (ctx, next) => {
         return
     }
 
-    var contract_conf = JSON.stringify({ "path": contract_abspath, "args": reqBody.args })
-    
+    var contract_conf = JSON.stringify({
+        "path": contract_abspath,
+        "args": reqBody.args
+    })
+
     //写入文件后会自动重新部署
     fs.writeFileSync(contractPathVal, contract_conf)
+    contractPathChangedLock = true
+    watchFileChanged = false
+    contractPathChanged()
 
     // 删除缓存，重新部署一下
     // delete require.cache[contract_abspath]
@@ -415,6 +446,32 @@ router.get('/_api/contract/methods', (ctx, next) => {
         status_code: 200,
         msg: "",
         data: nvm.contractMethods()
+    }
+})
+
+router.get('/_api/accounts', (ctx, next) => {
+    var accounts = []
+    var accounts_files = fs.readdirSync('./data/balance');
+    accounts_files.forEach(function (ele, index) {
+        if (ele[0] == "." || ele == 'contract.bak.txt') {
+            return
+        }
+        var account_file = "./data/balance/" + ele;
+        try {
+            var account = JSON.parse(fs.readFileSync(account_file).toString());
+        } catch (error) {
+            return
+        }
+
+        account.address = ele
+        accounts.push(account)
+    })
+
+
+    ctx.body = {
+        status_code: 200,
+        msg: "",
+        data: accounts
     }
 })
 

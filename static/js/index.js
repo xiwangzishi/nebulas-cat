@@ -481,8 +481,8 @@ var ConfigComponent = {
                 _this.call.args = '[]'
                 _this.call.result = ""
 
-                _this.getContractMethods()
                 _this.$message.success(_this.$t('deploySuccess'))
+                _this.getContractMethods()
             })
         }
     },
