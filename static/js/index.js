@@ -204,7 +204,49 @@ var HomeComponent = {
     }
 }
 
-
+var AccountComponent = {
+    template: '#account-tpl',
+    methods: {
+        changeBalance: function (account) {
+            var _this = this
+            this.$prompt('请输入账户余额，单位：NAS', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                showInput: true,
+                inputValue: fromBasicNas(account.balance)
+            }).then(function (ret) {
+                var value = ret.value
+                _this.$http.post('http://localhost:8685/_api/account/balance', {
+                        value: Unit.nasToBasic(value).toString(10),
+                        address: account.address
+                }).then(function (resp) {
+                    location.reload()
+                })
+            })
+        },
+        fetchAccountList: function () {
+            var _this = this;
+            this.$http.get('http://localhost:8685/_api/accounts').then(function (resp) {
+                _this.loading = false
+                var data = resp.data
+                if (data.status_code != 200) {
+                    return
+                }
+                _this.accounts = data.data
+            })
+        }
+    },
+    created: function () {
+        defaultData.activeIndex = 'account'
+        this.fetchAccountList()
+    },
+    data: function () {
+        return {
+            accounts: [],
+            loading: true,
+        }
+    }
+}
 
 var MyReceivedDonateComponent = {
     template: '#my-received-donate-tpl',
@@ -394,8 +436,8 @@ var ConfigComponent = {
                     _this.$eventHub.$emit("nebPayCall", data)
 
 
-                    }).catch(function () {
-                    
+                }).catch(function () {
+
                 });
 
             }).catch(function (err) {
@@ -414,6 +456,10 @@ var ConfigComponent = {
             }
             var _this = this
             if (action == "test") {
+                // if (this.call.value) {
+                //     this.$alert('call方法是在节点上模拟执行，所得结果并不会上链，所以不需要发送 NAS，请将发送 NAS 设置为 0')
+                //     return 
+                // }
                 nasApi.call({
                     chainID: nebState.chain_id,
                     from: app.address || chainInfo.contractAddress,
@@ -526,6 +572,11 @@ var routes = [{
         path: '/donate/received',
         component: MyReceivedDonateComponent,
         name: "myReceivedDonate"
+    },
+    {
+        path: '/account',
+        component: AccountComponent,
+        name: "AccountComponent"
     },
     {
         path: '/config',
@@ -779,7 +830,7 @@ var defaultData = {
     }
 }
 
-var locale = JSON.parse(localStorage.getItem("locale")||'{"locale":"en","name":"English"}')
+var locale = JSON.parse(localStorage.getItem("locale") || '{"locale":"en","name":"English"}')
 
 var Main = {
     router: router,
@@ -787,7 +838,7 @@ var Main = {
 
     },
     methods: {
-        changeLocal:function (item) {
+        changeLocal: function (item) {
             localStorage.setItem("locale", JSON.stringify(item))
             location.reload()
         },
@@ -851,7 +902,7 @@ var Main = {
         defaultData.address = address
         defaultData.menuStatus = false
         defaultData.noExtension = typeof (webExtensionWallet) === "undefined"
-        
+
         defaultData.locale = locale
         return defaultData
     }
@@ -893,10 +944,11 @@ Vue.mixin({
 
 // Vue.filter("contentFormat", contentFormat)
 
-Vue.filter("fromBasicNas", function (value) {
-    return Unit.fromBasic(Utils.toBigNumber(value, "nas")).toNumber()
-})
+function fromBasicNas(value) {
+    return Unit.fromBasic(Utils.toBigNumber(value), "nas").toNumber()
+}
 
+Vue.filter("fromBasicNas", fromBasicNas)
 
 defaultData.nebState = state
 
@@ -905,12 +957,14 @@ defaultData.nebState = state
 var i18n = new VueI18n({
     locale: locale.locale, // set locale
     messages, // set locale messages
-  })
-  
-  
+})
+
+
 
 cls = Vue.extend(Main)
-app = new cls({i18n:i18n})
+app = new cls({
+    i18n: i18n
+})
 
 getWallectInfo()
 

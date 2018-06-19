@@ -26,6 +26,9 @@
                 <el-menu-item index="home">
                     <router-link :to="{path:'/config'}">{{$t("project")}}</router-link>
                 </el-menu-item>
+                <el-menu-item index="account">
+                    <router-link :to="{path:'/account'}">{{$t("account")}}</router-link>
+                </el-menu-item>
                 <el-menu-item index="tutorial">
                     <router-link :to="{path:'/tutorial'}">{{$t("tutorial")}}</router-link>
                 </el-menu-item>
@@ -234,7 +237,34 @@
             </div>
         </div>
     </script>
-
+    <script type="text/x-template" id="account-tpl">
+        <div class="box" id="account" v-loading="loading">
+                <div class="header header-black">
+                    <div class="left">
+                        {{$t('accountList')}}
+                    </div>
+                </div>
+                <div class="content">
+                    <table class="table">
+                        <tr>
+                            <th>{{$t('address')}}</th>
+                            <th>{{$t('balance')}}</th>
+                            <th>{{$t('action')}}</th>
+                        </tr>
+                        <tr v-for="account in accounts" :key="account.address">
+                                <td>{{account.address=='contract'?$t('contractAddress'):account.address}}</td>
+                                <td>
+                                    {{account.balance|JSON.stringify}}
+                                    <p style="margin:0px;color:#bbb;font-size:13px;">{{account.balance|fromBasicNas}} NAS</p>
+                                </td>
+                                <td>
+                                    <a class="el-button--text" href="" @click.prevent="changeBalance(account)">{{$t('changeBalance')}}</a>
+                                </td>
+                            </tr>
+                    </table>
+                </div>
+        </div>
+    </script>
     <script type="text/x-template" id="my-received-donate-tpl">
         <div class="box" id="my-received-donate" v-loading="donateListLoading">
             <div class="header header-black">

@@ -49,7 +49,14 @@ var messages = {
         getTransTimeout: 'Query timeout! Please refresh the page later to check the latest information!',
         getTransErr:'There was an error in the query transaction result!',
         operationSuccess: 'Operation success',
-        startupToolTips:'It is detected that you have not startup the "nebulas-cat" tool. Please use it after startup!'
+        startupToolTips: 'It is detected that you have not startup the "nebulas-cat" tool. Please use it after startup!',
+        accountList: 'Account List',
+        address: 'Address',
+        balance: 'Balance',
+        action: 'Action',
+        changeBalance: 'Change Balance',
+        contractAddress: 'Contract Address',
+        account:'Account'
     },
     zh: {
         project: "项目",
@@ -101,7 +108,14 @@ var messages = {
         getTransTimeout: '查询超时！请稍后刷新页面查看最新内容！',
         getTransErr:'查询交易结果发生了错误！',
         operationSuccess: '操作成功',
-        startupToolTips:'检测到你还没有启动 nebulas-cat 工具，请启动后使用！'
+        startupToolTips: '检测到你还没有启动 nebulas-cat 工具，请启动后使用！',
+        accountList: '账号列表',
+        address: '地址',
+        balance: '余额',
+        action: '操作',
+        changeBalance: '更改余额',
+        contractAddress: '合约地址',
+        account:'账号'
     }
 }
 

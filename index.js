@@ -40,7 +40,7 @@ var app = new Koa();
 var activatedFile = "./data/.activated"
 var contractBalanceFile = './data/balance/contract'
 if (!fs.existsSync(contractBalanceFile)) {
-    fs.writeFileSync(contractBalanceFile, '{"balance":0,"nonce":0,"type":88}')
+    fs.writeFileSync(contractBalanceFile, '{"balance":"0","nonce":0,"type":88}')
 }
 
 // path.join(__dirname, "./bbs.js");
@@ -219,7 +219,7 @@ router.post('/v1/user/accountstate', (ctx, next) => {
 
     if (!fs.existsSync(addressFile)) {
         content = JSON.stringify({
-            balance: 1000000000000000000000,
+            balance: "1000000000000000000000",
             nonce: 0,
             type: 87 //type The type of address, 87 stands for normal address and 88 stands for contract address
         })
@@ -450,6 +450,21 @@ router.get('/_api/contract/methods', (ctx, next) => {
         status_code: 200,
         msg: "",
         data: nvm.contractMethods()
+    }
+})
+
+router.post('/_api/account/balance', (ctx, next) => {
+    var reqBody = ctx.request.body,
+        account_file = "./data/balance/" + reqBody.address;
+    var account = JSON.parse(fs.readFileSync(account_file).toString());
+    account.balance = reqBody.value
+
+    fs.writeFileSync(account_file,JSON.stringify(account))
+
+    ctx.body = {
+        status_code: 200,
+        msg: "",
+        data: account
     }
 })
 
