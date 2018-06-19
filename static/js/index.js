@@ -587,7 +587,8 @@ Vue.prototype.$eventHub = new Vue({
         nebPayCall: function (config) {
             var options = config.options || {},
                 serialNumber = "",
-                _this = this;
+                _this = this,
+                context = config.context;
             if (!options.callback) {
                 options.callback = chainInfo.payhost
             }
@@ -598,8 +599,8 @@ Vue.prototype.$eventHub = new Vue({
                     // console.log(value)
                     if (typeof value == 'string') {
                         _this.$notify({
-                            title: _this.$t('error'),
-                            message: _this.$t('rejectError'),
+                            title: context.$t('error'),
+                            message: context.$t('rejectError'),
                             duration: 3000,
                             type: 'error'
                         });
@@ -610,8 +611,8 @@ Vue.prototype.$eventHub = new Vue({
                     config.txhash = value.txhash
 
                     config.transStateNotify = _this.$notify({
-                        title: _this.$t('getTransStatus'),
-                        message: _this.$t('getTransStatusTips'),
+                        title: context.$t('getTransStatus'),
+                        message: context.$t('getTransStatusTips'),
                         duration: 0,
                         type: 'warning'
                     });
@@ -687,7 +688,7 @@ Vue.prototype.$eventHub = new Vue({
                         if (config.successFunc) {
                             setTimeout(function () {
                                 config.successFunc(receipt)
-                            }, 300)
+                            }, 200)
 
                         }
                     } else if (receipt.status === 0) { //错误
@@ -703,7 +704,7 @@ Vue.prototype.$eventHub = new Vue({
                         if (config.failFunc) {
                             setTimeout(function () {
                                 config.failFunc(receipt)
-                            }, 300)
+                            }, 200)
 
                         }
                     }

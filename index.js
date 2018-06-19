@@ -37,7 +37,7 @@ var app = new Koa();
 //     gasPrice: "1000000",
 //     gasLimit: "20000"
 // };
-
+var activatedFile = "./data/.activated"
 var contractBalanceFile = './data/balance/contract'
 if (!fs.existsSync(contractBalanceFile)) {
     fs.writeFileSync(contractBalanceFile, '{"balance":0,"nonce":0,"type":88}')
@@ -376,7 +376,7 @@ router.post('/v1/user/getEventsByHash', (ctx, next) => {
 })
 
 router.get('/_api/checkActivation', (ctx, next) => {
-    if (!fs.existsSync("./data/.activated")) {
+    if (!fs.existsSync(activatedFile)) {
         ctx.body = {
             status_code: 404,
             msg: "inactivated"
@@ -390,7 +390,7 @@ router.get('/_api/checkActivation', (ctx, next) => {
 })
 
 router.post('/_api/checkActivation', (ctx, next) => {
-    fs.writeFileSync("./data/.activated", ctx.request.rawBody)
+    fs.writeFileSync(activatedFile, ctx.request.rawBody)
     ctx.body = {
         status_code: 200,
         msg: "success"
