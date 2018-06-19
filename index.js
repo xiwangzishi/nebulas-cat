@@ -69,8 +69,9 @@ var contract_conf = readContractFilePath(),
 // if (!fs.existsSync(contract_file)) {
 //     contract_file = path.join(__dirname, "./smartContract/nebulas-cat.js");
 // }
-
-// nvm.deploy(contract_file, contract_conf.args);
+if (fs.existsSync(contract_file)) {
+    nvm.deploy(contract_file, contract_conf.args);
+}
 
 function reDeployContract(contract_path, args) {
     var contract_abspath = path.resolve(contract_path)
@@ -165,6 +166,7 @@ router.get('/v1/user/nebstate', (ctx, next) => {
 })
 
 router.post('/v1/user/call', (ctx, next) => {
+    global.CanContractStorage = false
     // {
     // 	"from":"n1X5tQyqNtWNZzXA5WzrbBAZktmGYE3jduj",
     // 	"to":"n1jWpKadorv27XgSbo4WRZvsyCdAajkEP4B",
@@ -233,6 +235,8 @@ router.post('/v1/user/accountstate', (ctx, next) => {
 })
 
 router.post('/v1/user/rawtransaction', (ctx, next) => {
+    global.CanContractStorage = true
+
     var tx = new Transaction({
         chainID: 100,
         from: "n1Et8GL1cszLkzRUxPe14pRcdo5hbpZpCrP",

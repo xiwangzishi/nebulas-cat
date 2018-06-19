@@ -18,9 +18,10 @@ var contract = null
 NVM.prototype = {
     deploy: function (contract_file, args) {
         console.log("require contract file：", contract_file)
+        global.CanContractStorage = true
 
-        var Contract = require(contract_file);
-        contract = new Contract();
+        var ContractCls = require(contract_file);
+        contract = new ContractCls();
 
         var exists = fs.existsSync(".init")
         if (exists) {
@@ -69,13 +70,15 @@ NVM.prototype = {
         if (args === undefined || args.length === 0) {
             args = "[]";
         }
-        if (contract[func] != undefined) {
-            var result = contract[func].apply(contract, JSON.parse(args));
-            trans.hash = ""
-            return result
-        } else {
+
+        if (contract[func] == undefined) {
             throw new Error("function not found");
         }
+
+        var result = contract[func].apply(contract, JSON.parse(args));
+        trans.hash = ""
+
+        return result
     }
 };
 

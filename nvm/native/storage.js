@@ -13,7 +13,10 @@ NativeStorage.prototype = {
     get: function(key) {
         return localStorage.getItem(key);
     },
-    set: function(key, value) {
+    set: function (key, value) {
+        if (!global.CanContractStorage) {
+            return 0;
+        }
         localStorage.setItem(key, value);
         return 0;
     },
