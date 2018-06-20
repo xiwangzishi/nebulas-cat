@@ -38,6 +38,11 @@ var app = new Koa();
 //     gasLimit: "20000"
 // };
 var activatedFile = "./data/.activated"
+var balanceDir = "./data/balance"
+if (!fs.existsSync(balanceDir)) {
+    fs.mkdirSync(balanceDir)
+}
+
 var contractBalanceFile = './data/balance/contract'
 if (!fs.existsSync(contractBalanceFile)) {
     fs.writeFileSync(contractBalanceFile, '{"balance":"0","nonce":0,"type":88}')
