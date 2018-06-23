@@ -424,12 +424,6 @@ router.post('/_api/contract/path', (ctx, next) => {
         "args": reqBody.args
     })
 
-    //写入文件后会自动重新部署
-    fs.writeFileSync(contractPathVal, contract_conf)
-    contractPathChangedLock = true
-    watchFileChanged = false
-    contractPathChanged()
-
     // 删除缓存，重新部署一下
     // delete require.cache[contract_abspath]
 
@@ -443,6 +437,12 @@ router.post('/_api/contract/path', (ctx, next) => {
 
     }
     // nvm.deploy(contract_abspath, reqBody.args);
+
+    //写入文件后会自动重新部署
+    fs.writeFileSync(contractPathVal, contract_conf)
+    contractPathChangedLock = true
+    watchFileChanged = false
+    contractPathChanged()
 
     ctx.body = {
         status_code: 200,
