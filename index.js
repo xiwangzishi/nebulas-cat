@@ -208,6 +208,8 @@ router.post('/v1/user/call', (ctx, next) => {
         // {"result":"Error: 403","execute_err":"Call: Error: 403","estimate_gas":"20378"}
         result.execute_err = "Call: Error: " + e.message
         result.result = "Error: " + e.message
+
+        console.log("\x1b[31mUser Call Error:%s\x1b[0m",e.message)
     }
 
     ctx.body = {
@@ -327,6 +329,9 @@ router.post('/v1/user/rawtransaction', (ctx, next) => {
         transactionReceipt.status = 0
         transactionReceipt.execute_error = "Call: Error: " + error.message
         transactionReceipt.execute_result = "Error: " + error.message
+
+        console.log("\x1b[31mTransaction Error:%s\x1b[0m",error.message)
+        // console.log("Transaction Error:",error.message)
         // execute_error:"Call: Error: 10000"
         // execute_result:"Error: 10000"
     }
