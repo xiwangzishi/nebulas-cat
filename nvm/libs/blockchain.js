@@ -18,6 +18,8 @@
 
 'use strict';
 
+var fs = require("fs")
+
 var Blockchain = function () {
     Object.defineProperty(this, "nativeBlockchain", {
         configurable: false,
@@ -74,6 +76,20 @@ Blockchain.prototype = {
     },
     verifyAddress: function (address) {
         return this.nativeBlockchain.verifyAddress(address);
+    },
+    getAccountState: function (address) {
+        var addressFile = BASE_PATH+'/data/balance/' + address
+        var content = fs.readFileSync(addressFile)
+        var account = JSON.parse(content)
+        
+        return {balance:account.balance,nonce:account.nonce}
+    },
+    getPreBlockHash: function (offset) {
+        return ""
+    },
+    getPreBlockSeed: function (offset) {
+        return ""
     }
+
 };
 module.exports = new Blockchain();
